@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:context="http://www.springframework.org/schema/context"
+             xmlns:mvc="http://www.springframework.org/schema/mvc"
+             xmlns:aop="http://www.springframework.org/schema/aop"
+             xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+    <!-- 使用注解的方式 -->
+    <annotation-driven />
+    <!-- 扫描包 -->
+    <context:component-scan base-package="cn.netty" />
+    <!--避免IE执行AJAX时，返回JSON出现下载文件 -->
+    <beans:bean id="mappingJacksonHttpMessageConverter"
+                class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <beans:property name="supportedMediaTypes">
+            <beans:list>
+                <beans:value>application/json;charset=UTF-8</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+    <!-- 启动SpringMVC的注解功能，完成请求和注解POJO的映射 -->
+    <beans:bean
+            class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <beans:property name="messageConverters">
+            <beans:list>
+                <beans:ref bean="mappingJacksonHttpMessageConverter" /> <!-- JSON转换器 -->
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+    <!-- ${webapproot resource path} -->
+    <!--<resources mapping="/**" location="/" />-->
+    <!-- spring MVC 视图解析 -->
+    <beans:bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+    <beans:property name="viewResolvers">
+    <beans:list>
+    <beans:bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+    <beans:bean class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+    <beans:property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+    <beans:property name="prefix" value="/WEB-INF/view" />
+    <beans:property name="suffix" value=".jsp" />
+    </beans:bean>
+    </beans:list>
+    </beans:property>
+    </beans:bean>
+    <beans:bean class="org.springframework.web.servlet.mvc.annotation.ResponseStatusExceptionResolver">
+    <beans:property name="order" value="0" />
+    </beans:bean>
+    <beans:bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+    <beans:property name="order" value="1" />
+    <beans:property name="defaultStatusCode" value="500" />
+    </beans:bean>
+    <beans:bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+    <!-- 引入配置文件 -->
+    <beans:bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <beans:property name="locations">
+            <beans:list>
+                <beans:value>classpath:application.properties</beans:value>
+                <beans:value>classpath:redis.properties</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+
+    <!-- jedis连接池配置 -->
+    <beans:bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <beans:property name="maxIdle" value="${redis.maxIdle}" />
+        <beans:property name="maxWaitMillis" value="${redis.maxWait}" />
+        <beans:property name="testOnBorrow" value="${redis.testOnBorrow}" />
+        <beans:property name="maxTotal" value="${redis.maxActive}" />
+        <beans:property name="blockWhenExhausted" value="true" />
+    </beans:bean>
+
+    <!-- jedis连接工程的配置 -->
+    <beans:bean id="jedisConnectionFactory" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <beans:property name="hostName" value="${redis.host}" />
+        <beans:property name="port" value="${redis.port}" />
+        <beans:property name="poolConfig" ref="jedisPoolConfig" />
+        <beans:property name="password" value="${redis.pass}" />
+        <beans:property name="usePool" value="true"/>
+        <beans:property name="timeout" value="${redis.timeout}"></beans:property>
+    </beans:bean>
+
+    <!-- redisTemplate配置 -->
+    <beans:bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+        <beans:property name="connectionFactory"   ref="jedisConnectionFactory" />
+
+        <beans:property name="keySerializer">
+            <beans:bean class="org.springframework.data.redis.serializer.StringRedisSerializer" />
+        </beans:property>
+        <beans:property name="valueSerializer">
+            <beans:bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer" />
+        </beans:property>
+        <beans:property name="hashKeySerializer">
+            <beans:bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+        </beans:property>
+        <beans:property name="hashValueSerializer">
+            <beans:bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/>
+        </beans:property>
+    </beans:bean>
+
+    <!-- 数据库连接池 -->
+    <beans:bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <beans:property name="driverClassName" value="${driver}" />
+        <beans:property name="url" value="${url}" />
+        <beans:property name="username" value="${username}" />
+        <beans:property name="password" value="${password}" />
+        <!--初始化连接大小-->
+        <beans:property name="initialSize" value="${initialSize}" />
+        <!--连接池最大连接数-->
+        <beans:property name="maxActive" value="${maxActive}" />
+        <!--连接池最大空闲数-->
+        <beans:property name="maxIdle" value="${maxIdle}" />
+        <!--连接池最小连接数-->
+        <beans:property name="minIdle" value="${minIdle}" />
+        <!--连接池获取连接最大等待时间-->
+        <beans:property name="maxWait" value="${maxWait}" />
+    </beans:bean>
+    <!--有问题-->
+    <!-- spring整合mybatis -->
+    <beans:bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <beans:property name="dataSource" ref="dataSource" />
+        <!-- 自动扫描mapping.xml文件 -->
+        <!--<beans:property name="mapperLocations" value="mappings/*.xml" />-->
+        <beans:property name="mapperLocations" >
+            <beans:list>
+                <beans:value>classpath:mappings/*.xml</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+    <!-- DAO接口所在的包位置，spring自动找到下面的类 -->
+    <beans:bean class="org.mybatis.spring.mapper.MapperScannerConfigurer" >
+        <beans:property name="basePackage" value="cn.netty.dao" />
+        <beans:property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+    </beans:bean>
+    <!-- (事务管理)transaction manager, use JtaTransactionManager for global tx -->
+    <beans:bean id="transactionManager"
+                class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <beans:property name="dataSource" ref="dataSource" />
+    </beans:bean>
+</beans:beans>
