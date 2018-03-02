@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="api">
+    <CLASSES />
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://E:/jar/zmxy-sdk-java15-20171212112759/zmxy-sdk-java-20171212112759-source.jar!/com/antgroup/zmxy/openplatform/api" />
+    </SOURCES>
+  </library>
+</component>
