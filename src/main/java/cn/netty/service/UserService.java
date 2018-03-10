@@ -6,7 +6,7 @@ import cn.netty.entity.User;
  * Created by liu_penghui on 2017/11/8.
  */
 public interface UserService {
-    public User getUserById(Integer id);
+    public User getUserById(String id);
 
-    public int insert(User user);
+    public void insert(User user);
 }

@@ -25,7 +25,7 @@ public class TestController {
 
     @RequestMapping(value = "/hello/{id}")
     @ResponseBody
-    public User hello(@PathVariable int id){
+    public User hello(@PathVariable String id){
         return userService.getUserById(id);
     }
 
@@ -38,9 +38,9 @@ public class TestController {
         user.setPassword(request.getParameter("password"));
         user.setAge(Integer.parseInt(request.getParameter("age")));
         //String a = request.getParameter("id");
-        int i = userService.insert(user);
+        userService.insert(user);
         JSONObject jb = new JSONObject();
-        jb.put("code", i);
+        jb.put("code", 0);
         jb.put("message", "insert successfully...");
         return jb;
     }

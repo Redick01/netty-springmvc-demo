@@ -16,6 +16,7 @@ public class Test implements Runnable {
     private volatile long count = 0;
     ApplicationContext ctx;
     RedisTemplate redisTemplate;
+
     public Test() {
         ctx = new ClassPathXmlApplicationContext("redis-test.xml");
         redisTemplate = (RedisTemplate) ctx.getBean("redisTemplate");
