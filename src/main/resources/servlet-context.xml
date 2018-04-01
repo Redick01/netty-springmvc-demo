@@ -86,7 +86,12 @@
         <beans:property name="usePool" value="true"/>
         <beans:property name="timeout" value="${redis.timeout}"></beans:property>
     </beans:bean>
-
+    <beans:bean  id="jedisPool" class="redis.clients.jedis.JedisPool" destroy-method="destroy">
+        <beans:constructor-arg index="0" ref="jedisPoolConfig" />
+        <beans:constructor-arg index="1" value="${redis.host}" />
+        <beans:constructor-arg index="2" value="${redis.port}" type="int" />
+        <beans:constructor-arg index="3" value="${redis.timeout}" type="int" />
+    </beans:bean>
     <!-- redisTemplate配置 -->
     <beans:bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
         <beans:property name="connectionFactory"   ref="jedisConnectionFactory" />
