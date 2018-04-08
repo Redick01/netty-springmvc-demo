@@ -1,8 +1,12 @@
 package cn.netty.controller;
 
 import cn.netty.entity.User;
+import cn.netty.redis.RedisUtil;
 import cn.netty.service.impl.UserServiceImpl;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -10,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by liu_penghui on 2017/11/4.
@@ -28,6 +34,23 @@ public class TestController {
     public User hello(@PathVariable String id){
         return userService.getUserById(id);
     }
+
+    @RequestMapping(value = "/jmeterTest" ,method = RequestMethod.GET)
+    @ResponseBody
+    public Object getAll() throws JsonProcessingException {
+
+        /*Object value = redisTemplate.opsForValue().get("user:");
+        if ("".equals(value) || null == value) {
+            List<User> user = userService.getAll();
+            ObjectMapper om = new ObjectMapper();
+            String jsonData = om.writeValueAsString(user);
+            redisTemplate.opsForValue().set("user:", jsonData, 10, TimeUnit.SECONDS);
+            value = redisTemplate.opsForValue().get("user:");
+        }*/
+        List<User> user = userService.getAll();
+        return JSON.toJSON(user);
+    }
+
 
     @RequestMapping(value = "/add")
     @ResponseBody

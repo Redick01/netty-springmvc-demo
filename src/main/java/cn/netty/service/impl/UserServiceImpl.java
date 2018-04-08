@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,12 +21,16 @@ public class UserServiceImpl implements UserService {
     @Resource
     private UserDao userDao;
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    //@Transactional(propagation = Propagation.REQUIRED)
     public User getUserById(String id) {
         Map<String, String> map = new HashMap<String, String>();
         map.put("id", id);
         map.put("orderParam", "id");
         return userDao.selectByPrimaryKey(map);
+    }
+
+    public List<User> getAll() {
+        return userDao.selectAll();
     }
 
     public void insert(User user) {

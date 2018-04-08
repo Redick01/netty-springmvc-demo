@@ -1,9 +1,11 @@
 package cn.netty.entity;
 
+import java.io.Serializable;
+
 //import javax.xml.bind.annotation.XmlRootElement;
 // xml格式
 //@XmlRootElement
-public class User {
+public class User implements Serializable {
     private Integer id;
 
     private String name;

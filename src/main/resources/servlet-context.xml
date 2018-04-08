@@ -75,6 +75,8 @@
         <beans:property name="testOnBorrow" value="${redis.testOnBorrow}" />
         <beans:property name="maxTotal" value="${redis.maxActive}" />
         <beans:property name="blockWhenExhausted" value="true" />
+        <beans:property name="testOnReturn" value="${redis.testOnReturn}" />
+        <beans:property name="testWhileIdle" value="${redis.testWhileIdle}" />
     </beans:bean>
 
     <!-- jedis连接工程的配置 -->
@@ -111,21 +113,29 @@
     </beans:bean>
 
     <!-- 数据库连接池 -->
-    <beans:bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    <beans:bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
         <beans:property name="driverClassName" value="${driver}" />
         <beans:property name="url" value="${url}" />
         <beans:property name="username" value="${username}" />
         <beans:property name="password" value="${password}" />
         <!--初始化连接大小-->
-        <beans:property name="initialSize" value="${initialSize}" />
+        <beans:property name="initialSize" value="1" />
         <!--连接池最大连接数-->
-        <beans:property name="maxActive" value="${maxActive}" />
+        <beans:property name="minIdle" value="2" />
+        <beans:property name="maxActive" value="10" />
         <!--连接池最大空闲数-->
-        <beans:property name="maxIdle" value="${maxIdle}" />
+        <beans:property name="maxWait" value="10000" />
+        <beans:property name="timeBetweenEvictionRunsMillis" value="60000" />
+        <beans:property name="minEvictableIdleTimeMillis" value="300000" />
+        <beans:property name="testWhileIdle" value="true" />
+        <beans:property name="testOnBorrow" value="true" />
+        <beans:property name="testOnReturn" value="false" />
+        <beans:property name="poolPreparedStatements" value="true" />
+        <beans:property name="maxPoolPreparedStatementPerConnectionSize" value="20" />
         <!--连接池最小连接数-->
-        <beans:property name="minIdle" value="${minIdle}" />
+        <!--<beans:property name="minIdle" value="${minIdle}" />-->
         <!--连接池获取连接最大等待时间-->
-        <beans:property name="maxWait" value="${maxWait}" />
+        <!--<beans:property name="maxWait" value="${maxWait}" />-->
     </beans:bean>
     <!--有问题-->
     <!-- spring整合mybatis -->
@@ -133,6 +143,7 @@
         <beans:property name="dataSource" ref="dataSource" />
         <!-- 自动扫描mapping.xml文件 -->
         <!--<beans:property name="mapperLocations" value="mappings/*.xml" />-->
+        <beans:property name="configLocation" value="classpath:mybatis-config.xml" />
         <beans:property name="mapperLocations" >
             <beans:list>
                 <beans:value>classpath:mappings/*.xml</beans:value>

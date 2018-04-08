@@ -2,6 +2,7 @@ package cn.netty.dao;
 
 import cn.netty.entity.User;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,6 +16,8 @@ public interface UserDao {
     int insertSelective(User record);
 
     User selectByPrimaryKey(Map<String, String> map);
+
+    List<User> selectAll();
 
     int updateByPrimaryKeySelective(User record);
 
